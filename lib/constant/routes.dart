@@ -8,6 +8,6 @@ import 'package:nutriapp/views/smartsearch.dart';
 Map<String, WidgetBuilder> routes = {
   "/home": (context) => Home(),
   "/customizesearch":(context) => Customization(),
-  "/smartsearch":(context) => SmartSearch(),
+  "/smartsearch":(context) => const SmartSearch(),
   "/dishes":(context) => Dish_Description()
 };

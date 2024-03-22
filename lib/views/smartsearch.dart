@@ -16,54 +16,56 @@ class _SmartSearchState extends State<SmartSearch> {
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
-
   @override
   void initState() {
     super.initState();
     _initSpeech();
   }
 
-  /// This has to happen only once per app
   void _initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
+    await _speechToText.initialize(
+      onStatus: (status) {
+        print("status$status");
+        if (status == 'listening') {
+          _speechToText.listen(
+            onResult: _onSpeechResult,
+            listenFor: const Duration(minutes: 10),
+            localeId: 'en_US', // Set the locale during listening
+          );
+        }
+      },
+    );
+
+    // Ensure _lastWords is empty when the page is loaded
+
+    _speechEnabled = true;
     setState(() {});
   }
 
-  /// Each time to start a speech recognition session
-  void _startListening() async {
-    await _speechToText.listen(onResult: _onSpeechResult);
-    setState(() {});
-  }
+ void _startListening() async {
+  Provider.of<GetDishProvider>(context, listen: false).clearfunction();
+  await _speechToText.listen(onResult: _onSpeechResult);
+  setState(() {});
+}
 
-  /// Manually stop the active speech recognition session
-  /// Note that there are also timeouts that each platform enforces
-  /// and the SpeechToText plugin supports setting timeouts on the
-  /// listen method.
+
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {});
   }
-  /// This is the callback that the SpeechToText plugin calls when
-  /// the platform returns recognized words.
+
   void _onSpeechResult(SpeechRecognitionResult result) {
-  setState(() {
-    _lastWords = result.recognizedWords;
-    print("_lastWords$_lastWords");
-    if (_lastWords.isNotEmpty && Provider.of<GetDishProvider>(context, listen: false).dishList!.isEmpty) {
-      Provider.of<GetDishProvider>(context, listen: false).selectedWord(_lastWords);
-      _stopListening();
-    }
-  });
-}
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
+    Provider.of<GetDishProvider>(context, listen: false).getLastword(_lastWords);
+  
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<GetDishProvider>(
       builder: (context, getdishprovider, child) {
-        if (_lastWords != "" && getdishprovider.dishList!.isEmpty) {
-          getdishprovider.selectedWord(_lastWords);
-           _stopListening();
-        }
         return Scaffold(
           appBar: AppBar(backgroundColor: ColorClass.baseColor),
           drawer: Drawer(
@@ -101,14 +103,8 @@ class _SmartSearchState extends State<SmartSearch> {
                     child: Container(
                       padding: EdgeInsets.all(16),
                       child: Text(
-                        // If listening is active show the recognized words
                         _speechToText.isListening
                             ? '$_lastWords'
-
-                            // If listening isn't active but could be tell the user
-                            // how to start it, otherwise indicate that speech
-                            // recognition is not yet ready or not supported on
-                            // the target device
                             : _speechEnabled
                                 ? 'Tap the microphone to start listening...'
                                 : 'Speech not available',
@@ -162,28 +158,27 @@ class _SmartSearchState extends State<SmartSearch> {
                                   )),
                             ),
                             SizedBox(width: 30,),
-                             Container(
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                shape: CircleBorder(),
-                                fixedSize: Size(80, 80),
-                                padding: EdgeInsets.all(14),
-                              ),
-                              onPressed:() {
-                                _stopListening();
-                                getdishprovider.getDishfromvoice();
-                                Navigator.pushNamed(context, '/customizesearch');
-                              },
-                              child: const Icon(
-                                Icons.stop,
-                                color: Colors.white,
-                                size: 25,
-                              )),
-                        ),
+                            Container(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    shape: CircleBorder(),
+                                    fixedSize: Size(80, 80),
+                                    padding: EdgeInsets.all(14),
+                                  ),
+                                  onPressed:() {
+                                    _stopListening();
+                                    getdishprovider.selectedWord(getdishprovider.wordlast);
+                                    Navigator.pushNamed(context, '/customizesearch');
+                                  },
+                                  child: const Icon(
+                                    Icons.stop,
+                                    color: Colors.white,
+                                    size: 25,
+                                  )),
+                            ),
                           ],
                         ),
-                        
                         const SizedBox(
                           height: 50,
                         ),

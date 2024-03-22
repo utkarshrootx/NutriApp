@@ -11,6 +11,8 @@ class GetDishProvider extends ChangeNotifier{
   List<Hits>? selecteddish ;
   List<dynamic> array = [];
   String result = "";
+  String wordlast = '';
+
 
   void getDish() async {
     try {
@@ -22,7 +24,7 @@ class GetDishProvider extends ChangeNotifier{
       rethrow;
     }
   }
-  void getDishfromvoice() async {
+  void getDishfromvoice(String Lastword) async {
     try {
       getdishes = await GetDishesservice().getdishes("sugar");
       dishList = getdishes.hits;
@@ -33,17 +35,6 @@ class GetDishProvider extends ChangeNotifier{
     }
   }
 
-  // void getvoicedDish() async{
-  //     try {
-  //     getdishes = await GetDishesservice().getdishes(result);
-  //     dishList = getdishes.hits;
-  //     notifyListeners();
-  //   } catch (e) {
-  //     print(e);
-  //     rethrow;
-  //   }
-  // }
-
   void selectedList(String label_data){
     for(var i in dishList!){
         if(i.recipe?.label == label_data){
@@ -53,10 +44,22 @@ class GetDishProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  void clearfunction(){
+    diseaseController.clear();
+    notifyListeners();
+  }
+
+ void getLastword(word){
+  wordlast = word;
+  notifyListeners();
+ }
+
   void selectedWord(String word) async {
+    print("word123$word");
      var response  = await Getword().getSelectedWord(word);
      print("response$response");   
-  diseaseController.text = response['keywords'].join('');
+  diseaseController.text = response['keywords'].join(' ');
   notifyListeners();
+  getDish();
   }
 }
