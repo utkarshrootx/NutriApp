@@ -1,13 +1,13 @@
+import '../model/getdishesmodel.dart';
 import 'baseservice.dart';
 
 class Getword extends BaseApiService {
-Future<Map<String,dynamic>> getSelectedWord(String word) async {
+Future<dishesModel> getSelectedWord(String word) async {
   try {
     var body = {"text": word};
-    var response = await sendRequest('https://nutriapp-chi.vercel.app/',
+    var response = await sendRequest('https://aijaz.pythonanywhere.com/audio_dishes',
         method: 'POST', body: body);
-    print("response12$response");
-    return response;
+    return dishesModel.fromJson(response);
   } catch (e) {
     print('error>$e');
     rethrow;

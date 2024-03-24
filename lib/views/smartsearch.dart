@@ -21,7 +21,6 @@ class _SmartSearchState extends State<SmartSearch> {
     super.initState();
     _initSpeech();
   }
-
   void _initSpeech() async {
     await _speechToText.initialize(
       onStatus: (status) {
@@ -42,12 +41,11 @@ class _SmartSearchState extends State<SmartSearch> {
     setState(() {});
   }
 
- void _startListening() async {
-  Provider.of<GetDishProvider>(context, listen: false).clearfunction();
-  await _speechToText.listen(onResult: _onSpeechResult);
-  setState(() {});
-}
-
+  void _startListening() async {
+    Provider.of<GetDishProvider>(context, listen: false).clearfunction();
+    await _speechToText.listen(onResult: _onSpeechResult);
+    setState(() {});
+  }
 
   void _stopListening() async {
     await _speechToText.stop();
@@ -58,8 +56,8 @@ class _SmartSearchState extends State<SmartSearch> {
     setState(() {
       _lastWords = result.recognizedWords;
     });
-    Provider.of<GetDishProvider>(context, listen: false).getLastword(_lastWords);
-  
+    Provider.of<GetDishProvider>(context, listen: false)
+        .getLastword(_lastWords);
   }
 
   @override
@@ -73,8 +71,18 @@ class _SmartSearchState extends State<SmartSearch> {
             child: ListView(
               children: [
                 ListTile(
-                  leading: const Icon(
+                  leading: Icon(
                     Icons.home,
+                  ),
+                  title: const Text('Home'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/home');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.search,
                   ),
                   title: const Text('Smart Search'),
                   onTap: () {
@@ -83,10 +91,30 @@ class _SmartSearchState extends State<SmartSearch> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(
-                    Icons.train,
+                  leading: Icon(
+                    Icons.draw_rounded,
                   ),
-                  title: const Text('Page 2'),
+                  title: const Text('Dashboard'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.menu,
+                  ),
+                  title: const Text('Menu'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/menu');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.food_bank,
+                  ),
+                  title: const Text(
+                    'Food Banks',
+                  ),
                   onTap: () {
                     Navigator.pop(context);
                   },
@@ -157,7 +185,9 @@ class _SmartSearchState extends State<SmartSearch> {
                                     size: 25,
                                   )),
                             ),
-                            SizedBox(width: 30,),
+                            SizedBox(
+                              width: 30,
+                            ),
                             Container(
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
@@ -166,10 +196,12 @@ class _SmartSearchState extends State<SmartSearch> {
                                     fixedSize: Size(80, 80),
                                     padding: EdgeInsets.all(14),
                                   ),
-                                  onPressed:() {
+                                  onPressed: () {
                                     _stopListening();
-                                    getdishprovider.selectedWord(getdishprovider.wordlast);
-                                    Navigator.pushNamed(context, '/customizesearch');
+                                    getdishprovider
+                                        .selectedWord(getdishprovider.wordlast);
+                                    Navigator.pushNamed(
+                                        context, '/customizesearch');
                                   },
                                   child: const Icon(
                                     Icons.stop,

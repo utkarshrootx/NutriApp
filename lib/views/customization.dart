@@ -12,10 +12,10 @@ class Customization extends StatefulWidget {
 }
 
 class _CustomizationState extends State<Customization> {
-   void initState() {
-    super.initState();
-    Provider.of<GetDishProvider>(context, listen: false).getDish();
-  }
+  //  void initState() {
+  //   super.initState();
+  //   Provider.of<GetDishProvider>(context, listen: false).getDish();
+  // }
   var controller = TextEditingController();
  
   @override
@@ -42,9 +42,9 @@ class _CustomizationState extends State<Customization> {
                   leading: Icon(
                     Icons.train,
                   ),
-                  title: const Text('Page 2'),
+                  title: const Text('Menu'),
                   onTap: () {
-                    Navigator.pop(context);
+                     Navigator.pushNamed(context, '/menu');
                   },
                 ),
               ],
@@ -125,7 +125,7 @@ class _CustomizationState extends State<Customization> {
       shrinkWrap: true,
       crossAxisCount: 2,
       padding: const EdgeInsets.all(15),
-      children: List.generate(dishprovider.dishList!.length, (index) {
+      children: List.generate( dishprovider.dishList!.length, (index) {
         return Container(
           padding: EdgeInsets.all(15),
           margin: EdgeInsets.all(15),
@@ -138,13 +138,13 @@ class _CustomizationState extends State<Customization> {
             children: [
               Container(
                 child: Image.network(
-                  dishprovider.dishList![index].recipe!.image ?? "",
+                  dishprovider.dishList![index].image! ?? "",
                   fit: BoxFit.cover,
                 ),
               ),
               SizedBox(height: 10),
               Text(
-                '${dishprovider.dishList![index].recipe?.label}',
+                '${dishprovider.dishList![index].lable??""}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: ColorClass.baseColor,
@@ -168,7 +168,7 @@ class _CustomizationState extends State<Customization> {
                   Spacer(),
                   ElevatedButton(
                     onPressed: () {
-                      dishprovider.selectedList(dishprovider.dishList?[index].recipe!.label??"");
+                      dishprovider.selectedList(dishprovider.dishList![index].lable??"");
                       Navigator.pushNamed(context, '/dishes');
                     },
                     child: Text(
